@@ -1,0 +1,11 @@
+[package]
+documentation = "https://github.com/cross-rs/wiki_assets"
+license = "MIT OR Apache-2.0"
+name = "openssl-certs"
+repository = "https://github.com/cross-rs/cross"
+version = "0.0.0-dev.0"
+edition = "2021"
+publish = false
+
+[dependencies]
+openssl = { version = "0.10", features = ["vendored"] }
