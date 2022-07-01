@@ -1,0 +1,12 @@
+[target.armv7-unknown-linux-gnueabihf]
+image = "libdbus:armhf"
+
+[target.aarch64-unknown-linux-gnu]
+image = "libdbus:arm64"
+
+[target.i686-unknown-linux-gnu]
+image = "libdbus:i686"
+
+[target.x86_64-unknown-linux-gnu]
+image = "libdbus:amd64"
+
