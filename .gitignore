@@ -3,3 +3,4 @@
 **/.vscode/*.*
 **/*.log
 /cargo-timing*.html
+*.profraw

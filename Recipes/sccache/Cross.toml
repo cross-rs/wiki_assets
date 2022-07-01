@@ -1,0 +1,11 @@
+[build.env]
+passthrough = [
+    "SCCACHE_ERROR_LOG",
+    "SCCACHE_LOG",
+    "SCCACHE_AZURE_CONNECTION_STRING",
+    "SCCACHE_AZURE_BLOB_CONTAINER",
+    "SCCACHE_DIR",
+]
+
+[target.x86_64-unknown-linux-musl]
+dockerfile = "Dockerfile.x86_64-unknown-linux-musl-sccache"
