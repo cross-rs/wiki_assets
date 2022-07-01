@@ -1,0 +1,109 @@
+# BUILD
+# -----
+# Set build configurations for all targets.
+
+[build]
+# Use xargo when cross-compiling for targets without a pre-built
+# standard library. Prefer `build-std` for most targets. This
+# requires nightly.
+xargo = true
+# Use `-Zbuild-std` when cross-compiling for targets without a
+# pre-built standard library. This overrides `xargo`: if enabled,
+# `xargo` will not be used.
+build-std = true
+# Default target to build if the target is not provided via
+# `--target` or `CARGO_BUILD_TARGET`.
+default-target = "x86_64-unknown-linux-gnu"
+# Additional commands to run prior to building the package.
+# These are translated into RUN commands to add to the Docker
+# image prior to running cross.
+pre-build = [
+    "dpkg --add-architecture $CROSS_DEB_ARCH",
+    "apt-get update && apt-get install --assume-yes libssl-dev:$CROSS_DEB_ARCH"
+]
+# A custom Dockerfile to use for all targets. This can be
+# provided as a struct or string. See below for a target
+# for the struct variant. Both pre-build hooks can a custom
+# Dockerfile can be provided: the pre-build hooks will be added
+# to the end of the Dockerfile.
+dockerfile = "Dockerfile"
+
+# BUILD ENVIRONMENT
+# -----------------
+# Set the build environment for all targets.
+
+[build.env]
+# Volumes to be mounted, passed via the value of an environment
+# variable. These will be passed to the container both as
+# a mountpoint and an environment variable. For example, the
+# path to `VOL2_ARG` will be available as `$VOL2_ARG`, and
+# the path will be mounted at `/path/to/volume`.
+# A value for the environment variable containing the
+# path to the volume can provided.
+volumes = ["VOL1_ARG", "VOL2_ARG=/path/to/volume"]
+# Environment variables to be passed through to the container.
+# A value for the environment variable can provided.
+passthrough = ["VAR1_ARG", "VAR2_ARG=VALUE"]
+
+# TARGET
+# ------
+# Set build configurations for a single target. These
+# values override those present in `[build]`.
+
+[target.aarch64-unknown-linux-gnu]
+# Disable xargo for only `aarch64-unknown-linux-gnu`.
+xargo = false
+# Also disable `build-std` for `aarch64-unknown-linux-gnu`,
+# since it already has a std library pre-built.
+build-std = true
+# An optional runner to override the default runner,
+# for example, allowing the use of Qemu or a native
+# runner for binaries. Defaults to `qemu-user` for
+# non-native binaries, or `native` for native binaries.
+runner = "qemu-user"
+# A custom Docker image for `cross` to execute the build
+# commands in. This image must be pre-built and will override
+# the pre-build hooks.
+image = "repository:tag"
+# Additional commands to run prior to building the package.
+# These override the commands present in `[build]`: they
+# will not merge.
+pre-build = [
+    "dpkg --add-architecture $CROSS_DEB_ARCH",
+    "apt-get update && apt-get install --assume-yes libssl-dev:$CROSS_DEB_ARCH",
+    "echo -e '#!/bin/bash\necho test' > /usr/bin/test-echo",
+    "chmod +x /usr/bin/test-echo"
+]
+
+# A custom Dockerfile for this specific target. This can
+# also be provided as a string (see `build.dockerfile`).
+[target.aarch64-unknown-linux-gnu.dockerfile]
+# The dockerfile to use relative to `Cargo.toml`
+# This must be provided.
+file = "Dockerfile"
+# The context directory for the build script. This is the directory
+# where all COPY run from, and Docker cannot access files outside
+# of this build context. The entire contents of the directory
+# will be sent to the Docker daemon, so try to use a context
+# with a small number of files.
+# https://docs.docker.com/engine/reference/builder/#usage
+context = "."
+# Additional arguments to pass to the build script.
+# https://docs.docker.com/engine/reference/builder/#arg
+build-args = { ARG1 = "foo" }
+
+# TARGET ENVIRONMENT
+# ------------------
+# Set build configurations for a single target. These
+# values override those present in `[build]`.
+
+[target.aarch64-unknown-linux-gnu.env]
+# Volumes to be mounted in the container. If provided, these
+# override the volumes specified in `build.env.volumes`.
+volumes = ["VOL3_ARG", "VOL4_ARG=/path/to/vol4"]
+# Environment variables to be passed through to the container.
+# These will merge with the environment variables specified
+# in `build.env.passthrough`. Note that this behavior will
+# change in `v0.3.0`, where they will override the
+# `build.env.passthrough` values.
+passthrough = ["VAR1_ARG", "VAR2_ARG=VALUE"]

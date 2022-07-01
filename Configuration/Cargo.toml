@@ -1,0 +1,22 @@
+[package]
+documentation = "https://github.com/cross-rs/wiki_assets"
+license = "MIT OR Apache-2.0"
+name = "config"
+repository = "https://github.com/cross-rs/wiki_assets"
+version = "0.0.0-dev.0"
+edition = "2021"
+publish = false
+
+# Cargo.toml is identical to `Cross.toml`, except it
+# is automatically included in a repository, and
+# prefixes all keys with `package.metadata.cross`
+# See `Cross.toml` for more extensive documentation.
+[package.metadata.cross.build]
+xargo = true
+
+[package.metadata.cross.target.aarch64-unknown-linux-gnu]
+xargo = false
+build-std = false
+image = "test-image"
+pre-build = ["apt-get update"]
+runner = "custom-runner"
