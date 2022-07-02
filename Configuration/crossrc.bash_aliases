@@ -68,9 +68,29 @@ CROSS_REMOTE=1
 QEMU_STRACE=1
 
 # Specify whether to container engine runs as root or is rootless.
-# When unset, set to `auto`, `0`, empty, or `false`, it assumes docker
+# When unset, set to `auto`, `0`, empty, or `false`, cross assumes docker
 # runs as root and all other container engines are rootless.
 CROSS_ROOTLESS_CONTAINER_ENGINE=1
+
+# Copy the cargo registry and git directories. The must be enabled
+# to support private SSH dependencies. When unset, set to `auto`,
+# `0`, empty, or `false`, cross does not copy the registry, requiring it
+# to be recreated on the remote data volume.
+CROSS_REMOTE_COPY_REGISTRY=1
+
+# Copy all directories, even those containing CACHETAG.DIR (a cache
+# directory tag). When unset, set to `auto`, `0`, empty, or `false`,
+# cross skips any cache directories, reducing the amount of data transferred
+# to the remote client.
+CROSS_REMOTE_COPY_CACHE=1
+
+# Do not copy any generated build artifacts back to the host after
+# finishing the build. If using persistent data volumes, the artifacts
+# will remain in the volume. This is useful if building remotely while
+# testing changes made locally: that is, if the generated build artifacts
+# are not always or never needed. When unset, set to `auto`, `0`, empty,
+# or `false`, cross copies the target directory back to the host.
+CROSS_REMOTE_SKIP_BUILD_ARTIFACTS=1
 
 # Custom the container user namespace. If set to none, user namespaces
 # will be disabled. If not provided or set to `auto`, it will use the
