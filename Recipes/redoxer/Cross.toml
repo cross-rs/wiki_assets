@@ -1,0 +1,12 @@
+[target.armv7-unknown-linux-gnueabihf]
+dockerfile = "armhf.Dockerfile"
+
+[target.aarch64-unknown-linux-gnu]
+dockerfile = "aarch64.Dockerfile"
+
+[target.i686-unknown-linux-gnu]
+dockerfile = "i686.Dockerfile"
+
+[target.x86_64-unknown-linux-gnu]
+dockerfile = "amd64.Dockerfile"
+
