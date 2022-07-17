@@ -1,0 +1,97 @@
+#!/usr/bin/env bash
+# Wrapper script for CMake to allow adding toolchain files on-the-fly.
+
+# CMake has a few different forms of commands, but it's very simple
+# due to how CMake handles commands.
+#
+#   cmake --build .                     # Works, invokes build
+#   cmake --config Release --build .    # Fails, must use --build first.
+#
+# This makes it really simple, since we only need to know if the first
+# argument is `--build`, `--install`, etc.
+#
+# Configure commands have the following signature:
+#   cmake [<options>] <path-to-source>
+#   cmake [<options>] <path-to-existing-build>
+#   cmake [<options>] -S <path-to-source> -B <path-to-build>
+#
+# Non-configure commands have the following signature.
+#   cmake --build <dir> [<options>] [-- <build-tool-options>]
+#   cmake --install <dir> [<options>]
+#   cmake --open <dir>
+#   cmake [{-D <var>=<value>}...] -P <cmake-script-file>
+#   cmake -E <command> [<options>]
+#   cmake --find-package [<options>]
+#   cmake --help[-<topic>]
+
+# Check to see if our first argument is a configure command.
+# If it is, add a default toolchain file.
+cmake="/usr/local/bin/cmake"
+. /opt/cross/find
+
+# Convert the arguments to an array, and add our toolchain file if
+# we are configuring.
+arguments=("${@}")
+if [ "${#arguments[@]}" -ne 0 ]; then
+    # Check to see if the next argument is invalid.
+    case "${arguments[0]}" in
+        --build)
+            ;;
+        --install)
+            ;;
+        --open)
+            ;;
+        -E)
+            ;;
+        --find-package)
+            ;;
+        --help)
+            ;;
+        --version)
+            ;;
+        *)
+            # Don't provide a toolchain file if we're using
+            # a script, IE, `cmake [-D...] -P ..`.
+            is_script=no
+            index=0
+            while [ ${index} -lt ${#arguments[@]} ]; do
+                argument="${arguments[${index}]}"
+                if [[ "$argument" = -D* ]]; then
+                    index=$((${index} + 1));
+                elif [[ "$argument" = -P ]]; then
+                    is_script=yes
+                    break
+                else
+                    break
+                fi
+            done
+
+            # Don't provide a toolchain file if it's already provided.
+            has_toolchain="${is_script}"
+            if find -DCMAKE_TOOLCHAIN_FILE "${arguments[@]}"; then
+                has_toolchain=yes
+            fi
+
+            # Add our toolchain if required.
+            # We search first for vcpkg, if not, fallback to our default path.
+            if [ "${has_toolchain}" = no ]; then
+                vcpkg_toolchain="/opt/vcpkg/scripts/buildsystems/vcpkg.cmake"
+                if [ -f "${vcpkg_toolchain}" ]; then
+                    arguments+=(
+                        "-DCMAKE_TOOLCHAIN_FILE=${vcpkg_toolchain}"
+                        "-DVCPKG_TARGET_TRIPLET=$(cat /opt/vcpkg/triple)-cross"
+                        "-DVCPKG_CHAINLOAD_TOOLCHAIN_FILE=/opt/cross/toolchain.cmake"
+                    )
+                else
+                    arguments+=("-DCMAKE_TOOLCHAIN_FILE=/opt/cross/toolchain.cmake")
+                fi
+            fi
+            ;;
+    esac
+fi
+
+# Call our command.
+if [ "${VERBOSE}" != "" ]; then
+    echo "${cmake}" "${arguments[@]}"
+fi
+"${cmake}" "${arguments[@]}"
