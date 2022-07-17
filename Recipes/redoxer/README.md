@@ -11,5 +11,3 @@ This supports the following targets:
 - `aarch64-unknown-linux-gnu`
 - `i686-unknown-linux-gnu`
 - `x86_64-unknown-linux-gnu`
-
-Please note that this requires a base Ubuntu version of 20.04, and therefore needs you to build the images with [newer Linux versions](https://github.com/cross-rs/cross/wiki/FAQ#newer-linux-versions).
