@@ -18,3 +18,7 @@ Feel free to populate this list with more targets or request additional targets.
 ### Issues
 
 - `vcpkg` does not work with `i686-unknown-linux-gnu` or `mips64el-unknown-linux-gnuabi64`.
+
+### License
+
+All the code in this package is unlicensed, and is freely released into the public domain.
