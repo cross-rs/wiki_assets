@@ -1,0 +1,12 @@
+[package]
+documentation = "https://github.com/cross-rs/wiki_assets"
+license = "MIT OR Apache-2.0"
+name = "sqlx-proc-macro"
+repository = "https://github.com/cross-rs/wiki_assets"
+version = "0.0.0-dev.0"
+edition = "2021"
+publish = false
+
+[dependencies]
+sqlx = { version = "0.6", features = [ "runtime-tokio-native-tls", "sqlite" ] }
+async-std = { version = "1", features = [ "attributes" ] }
