@@ -2,6 +2,7 @@ use dbus::blocking::Connection;
 use std::time::Duration;
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
+    println!("Connecting");
     // First open up a connection to the session bus.
     let conn = Connection::new_session()?;
 
